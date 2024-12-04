@@ -2,6 +2,7 @@
 #include <thread>
 #include <vector>
 
+__attribute__((noinline))
 int fib(int n) { return n > 1 ? fib(n - 1) + fib(n - 2) : 1; }
 
 int main() {
