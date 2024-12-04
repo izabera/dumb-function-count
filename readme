@@ -1,6 +1,0 @@
-compile your code with -pg -mfentry
-then run LD_PRELOAD=./count.so ./your-program-here to get a function call tally
-
-compared to gprof:
-- this supports threads
-- the profiling function is 6 instructions on x86, so it's a lot lighter

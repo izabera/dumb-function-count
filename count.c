@@ -16,7 +16,7 @@
  */
 struct entry {
     int tid;
-    unsigned long count;
+    size_t count;
     struct entry *next;
 };
 static struct entry *list;
@@ -35,9 +35,29 @@ static struct entry *list;
 __attribute__((tls_model("initial-exec")))
 static thread_local struct entry *mine;
 
+#if PLAY_IT_SAFE
 __attribute__((used,no_caller_saved_registers,target("general-regs-only")))
 void __fentry__() { mine->count++; }
-
+#else
+/* actually it seems fine to touch rax in __fentry__
+ *
+ * pick 2 of the following 3:
+ * - write this in c
+ * - not save useless registers
+ * - not touch registers other than rax without depending on -O3
+ *
+ * this other version didn't save the registers properly on arm anyway :(
+ *
+ * it might break with lto...?
+ */
+__attribute__((used,naked))
+void __fentry__(){
+    asm("mov mine@gottpoff(%rip), %rax\n"
+        "mov %fs:(%rax), %rax\n"
+        "incq 8(%rax)\n"
+        "ret\n");
+}
+#endif
 
 /* there is no proper api to register a callback to run at thread creation, so
  * we wrap pthread_create instead, as this is meant to be LD_PRELOADed anyway
