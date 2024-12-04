@@ -1,0 +1,17 @@
+#!/bin/bash
+run() {
+    TIMEFORMAT=$'real\t%R\tuser\t%U\tsys\t%S'
+
+    make clean
+    make CXX=$1
+
+    echo $1 baseline
+    for i in {1..10}; do time ./fibnoprof &>/dev/null; done
+    echo $1 gprof
+    for i in {1..10}; do time ./fib &>/dev/null; done
+    echo $1 preload
+    for i in {1..10}; do time LD_PRELOAD=./count.so ./fib &>/dev/null; done
+}
+
+run g++
+run clang++

@@ -3,7 +3,7 @@ compile your code with `-pg -mfentry`, then run
 
 (it also works if you just link against it, without the preload)
 
-the profiling function is 4 instructions, so it's a *lot* lighter than gprof
+the profiling function is 3 instructions, so it's a *lot* lighter than gprof
 
 
 
@@ -13,6 +13,8 @@ the worst-case performance impact for all profilers of this kind
 it also spawns a lot of threads, so there's some variability in the results
 
 
+
+(todo: update timings)
 
 running on a decent laptop:
 

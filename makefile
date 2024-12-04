@@ -3,9 +3,9 @@ all: fib fibnoprof count.so
 clean:
 	$(RM) fib fibnoprof count.so gmon.out
 
-count.so: override CFLAGS += -fPIC -shared -fcf-protection=none -O3
-count.so: count.c
-	$(LINK.c) $^ $(LDLIBS) -o $@
+count.so: override CXXFLAGS += -fPIC -shared -fcf-protection=none -O3
+count.so: count.cpp
+	$(LINK.cc) $^ $(LDLIBS) -o $@
 
 CXXFLAGS = -O3
 
