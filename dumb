@@ -1,0 +1,34 @@
+#!/bin/bash
+args=()
+for arg do
+    shift
+    case $arg in
+        --) break ;;
+        -B) rebuild=1 ;;
+        -?) echo weird opt "$arg" >&2; exit 1;;
+        *) args+=("$arg")
+    esac
+done
+args+=("$@")
+set -- "${args[@]-build.dumb}"
+
+check() {
+    [[ $rebuild = 1 || ! -e $1 ]] && return
+    for i in "${@:2}"; do
+        [[ $1 -ot $i ]] && return
+    done
+}
+in: () {  in+=("$@"); }
+out:() { out+=("$@"); }
+cmd:() {
+    for i in "${out[@]}"; do
+        if check "$i" "${in[@]}"; then
+            echo cmd: "$@" >&2
+            "$@" || { e=$?; rm -f "${out[@]}"; exit "$e"; }
+            break
+        fi
+    done
+    in=() out=()
+}
+
+for i do source "$i"; done

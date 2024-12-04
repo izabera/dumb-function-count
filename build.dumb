@@ -1,0 +1,17 @@
+#!/usr/bin/env dumb
+
+in: fentry.cpp count.hpp
+out: fentry.o
+cmd: clang++ -std=c++17 -ggdb3 -fPIC -mgeneral-regs-only -c fentry.cpp
+
+in: count.cpp count.hpp
+out: count.o
+cmd: clang++ -std=c++17 -ggdb3 -fPIC -c count.cpp
+
+in: count.o fentry.o
+out: count.so
+cmd: clang++ -std=c++17 -ggdb3 -fPIC -shared -fvisibility=hidden count.o fentry.o -o count.so
+
+in: user.cpp
+out: user
+cmd: clang++ -std=c++17 -ggdb3 -pg -mfentry user.cpp -o user -fsanitize=address
