@@ -47,11 +47,14 @@ struct main_thread {
         orig = reinterpret_cast<orig_type>(dlsym(RTLD_NEXT, "pthread_create"));
     }
     ~main_thread() {
+        size_t total = 0;
         for (entry *e = list, *next; e; e = next) {
             fprintf(stderr, "tid=%d count=%zu\n", e->tid, e->count);
+            total += e->count;
             next = e->next;
             delete e;
         }
+        fprintf(stderr, "total=%zu\n", total);
     }
 } main_thread;
 
