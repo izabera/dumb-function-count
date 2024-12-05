@@ -1,17 +1,7 @@
 #!/bin/bash
-run() {
-    TIMEFORMAT=$'real\t%R\tuser\t%U\tsys\t%S'
+TIMEFORMAT=$'real\t%R\tuser\t%U\tsys\t%S'
 
-    make clean
-    make CXX=$1
-
-    echo $1 baseline
-    for i in {1..10}; do time ./fibnoprof --no-threads &>/dev/null; done
-    echo $1 gprof
-    for i in {1..10}; do time ./fib --no-threads &>/dev/null; done
-    echo $1 preload
-    for i in {1..10}; do time LD_PRELOAD=./count.so ./fib --no-threads &>/dev/null; done
-}
-
-run g++
-run clang++
+for i in baseline with-static with-dynamic gprof; do
+    echo $i
+    for _ in {1..10}; do time ${1-build}/$i --no-threads &>/dev/null; done
+done
