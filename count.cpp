@@ -42,9 +42,20 @@ struct entry {
 using orig_type = int (*)(pthread_t *, const pthread_attr_t *, void *(*)(void *), void *);
 orig_type orig;
 
+struct thread {
+    std::mutex m;
+    ~thread() {
+        std::unique_lock lock{m};
+        list = new entry{gettid(), count, list};
+    }
+};
+
+extern thread_local thread this_thread;
+
 struct main_thread {
     main_thread() {
         orig = reinterpret_cast<orig_type>(dlsym(RTLD_NEXT, "pthread_create"));
+        (void) this_thread;
     }
     ~main_thread() {
         size_t total = 0;
@@ -57,14 +68,7 @@ struct main_thread {
         fprintf(stderr, "total=%zu\n", total);
     }
 } main_thread;
-
-struct thread {
-    std::mutex m;
-    ~thread() {
-        std::unique_lock lock{m};
-        list = new entry{gettid(), count, list};
-    }
-} thread_local this_thread;
+thread_local thread this_thread;
 
 struct targs {
     void *(*func)(void *);
